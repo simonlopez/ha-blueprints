@@ -1,0 +1,192 @@
+blueprint:
+  name: Zigbee2MQTT - Tuya 6-Button Scene Switch TS0046
+  description: Automate your Tuya 6-Button Scene Switch (TS0046) via Zigbee2MQTT.
+  domain: automation
+  input:
+    switch:
+      name: TS0046 Switch
+      description: Tuya 6-Button Scene Switch to use
+      selector:
+        entity:
+          domain: sensor
+          integration: mqtt
+    button_one_short_press:
+      name: Single Press - Button 1 (upper left)
+      description: Action to run on button 1 (upper left) single press
+      default: []
+      selector:
+        action: null
+    button_one_hold:
+      name: Hold - Button 1 (upper left)
+      description: Action to run on button 1 (upper left) single press
+      default: []
+      selector:
+        action: null
+    button_one_double_press:
+      name: Double Press - Button 1 (upper left)
+      description: Action to run on button 1 (upper left) single press
+      default: []
+      selector:
+        action: null
+    button_two_short_press:
+      name: Single Press - Button 2 (upper right)
+      description: Action to run on button 2 (upper right) single press
+      default: []
+      selector:
+        action: null
+    button_two_hold:
+      name: Hold - Button 2 (upper right)
+      description: Action to run on button 2 (upper right) single press
+      default: []
+      selector:
+        action: null
+    button_two_double_press:
+      name: Double Press - Button 2 (upper right)
+      description: Action to run on button 2 (upper right) single press
+      default: []
+      selector:
+        action: null
+    button_three_short_press:
+      name: Single Press - Button 3 (middle left)
+      description: Action to run on button 3 (middle left) single press
+      default: []
+      selector:
+        action: null
+    button_three_hold:
+      name: Hold - Button 3 (middle left)
+      description: Action to run on button 3 (middle left) long press
+      default: []
+      selector:
+        action: null
+    button_three_double_press:
+      name: Double Press - Button 3 (middle left)
+      description: Action to run on button 3 (middle left) long press
+      default: []
+      selector:
+        action: null
+    button_four_short_press:
+      name: Single Press - Button 4 (middle right)
+      description: Action to run on button 4 (middle right) single press
+      default: []
+      selector:
+        action: null
+    button_four_hold:
+      name: Long Press - Button 4 (middle right)
+      description: Action to run on button 4 (middle right) long press
+      default: []
+      selector:
+        action: null
+    button_four_double_press:
+      name: Double Press - Button 4 (middle right)
+      description: Action to run on button 4 (middle right) long press
+      default: []
+      selector:
+        action: null
+    button_five_short_press:
+      name: Single Press - Button 5 (bottom left)
+      description: Action to run on button 5 (bottom left) single press
+      default: []
+      selector:
+        action: null
+    button_five_hold:
+      name: Hold - Button 5 (bottom left)
+      description: Action to run on button 5 (bottom left) long press
+      default: []
+      selector:
+        action: null
+    button_five_double_press:
+      name: Double Press - Button 5 (bottom left)
+      description: Action to run on button 5 (bottom left) long press
+      default: []
+      selector:
+        action: null
+    button_six_short_press:
+      name: Single Press - Button 6 (bottom right)
+      description: Action to run on button 6 (bottom right) single press
+      default: []
+      selector:
+        action: null
+    button_six_hold:
+      name: Long Press - Button 6 (bottom right)
+      description: Action to run on button 6 (bottom right) long press
+      default: []
+      selector:
+        action: null
+    button_six_double_press:
+      name: Double Press - Button 6 (bottom right)
+      description: Action to run on button 6 (bottom right) long press
+      default: []
+      selector:
+        action: null
+  source_url: https://forge.slopez.fr/homeassistant/blueprints/raw/branch/main/Z2M/tuya/6_gang_portable_remote.yaml
+mode: single
+max_exceeded: silent
+variables:
+  command: '{{ trigger.payload }}'
+  topic: '{{ trigger.topic }}'
+  switch_name: !input 'switch'
+  deviceName: '{{ state_attr(switch_name, ''friendly_name'') }}'
+trigger:
+- platform: mqtt
+  topic: zigbee2mqtt/+/action
+action:
+- choose:
+  - conditions:
+    - '{{ topic.split(''/'')[1].replace(''/'', '''') == deviceName.split('' '')[0]
+      }}'
+    sequence:
+    - choose:
+      - conditions:
+        - '{{ command == ''1_single'' }}'
+        sequence: !input 'button_one_short_press'
+      - conditions:
+        - '{{ command == ''2_single'' }}'
+        sequence: !input 'button_two_short_press'
+      - conditions:
+        - '{{ command == ''3_single'' }}'
+        sequence: !input 'button_three_short_press'
+      - conditions:
+        - '{{ command == ''4_single'' }}'
+        sequence: !input 'button_four_short_press'
+      - conditions:
+        - '{{ command == ''5_single'' }}'
+        sequence: !input 'button_five_short_press'
+      - conditions:
+        - '{{ command == ''6_single'' }}'
+        sequence: !input 'button_six_short_press'
+      - conditions:
+        - '{{ command == ''1_double'' }}'
+        sequence: !input 'button_one_double_press'
+      - conditions:
+        - '{{ command == ''2_double'' }}'
+        sequence: !input 'button_two_double_press'
+      - conditions:
+        - '{{ command == ''3_double'' }}'
+        sequence: !input 'button_three_double_press'
+      - conditions:
+        - '{{ command == ''4_double'' }}'
+        sequence: !input 'button_four_double_press'
+      - conditions:
+        - '{{ command == ''5_double'' }}'
+        sequence: !input 'button_five_double_press'
+      - conditions:
+        - '{{ command == ''6_double'' }}'
+        sequence: !input 'button_six_double_press'
+      - conditions:
+        - '{{ command == ''1_hold'' }}'
+        sequence: !input 'button_one_hold'
+      - conditions:
+        - '{{ command == ''2_hold'' }}'
+        sequence: !input 'button_two_hold'
+      - conditions:
+        - '{{ command == ''3_hold'' }}'
+        sequence: !input 'button_three_hold'
+      - conditions:
+        - '{{ command == ''4_hold'' }}'
+        sequence: !input 'button_four_hold'
+      - conditions:
+        - '{{ command == ''5_hold'' }}'
+        sequence: !input 'button_five_hold'
+      - conditions:
+        - '{{ command == ''6_hold'' }}'
+        sequence: !input 'button_six_hold'

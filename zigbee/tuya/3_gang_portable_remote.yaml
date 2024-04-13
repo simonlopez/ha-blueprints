@@ -1,0 +1,111 @@
+blueprint:
+  name: Zigbee2MQTT - Tuya 3-Button Scene Switch TS0043
+  description: Automate your Tuya 3-Button Scene Switch (TS0043) via Zigbee2MQTT.
+  domain: automation
+  input:
+    switch:
+      name: TS0043 Switch
+      description: Tuya 3-Button Scene Switch to use
+      selector:
+        entity:
+          domain: sensor
+          integration: mqtt
+    button_one_short_press:
+      name: Single Press - Button 1 (upper)
+      description: Action to run on button 1 (upper) single press
+      default: []
+      selector:
+        action: null
+    button_one_hold:
+      name: Hold - Button 1 (upper)
+      description: Action to run on button 1 (upper) single press
+      default: []
+      selector:
+        action: null
+    button_one_double_press:
+      name: Double Press - Button 1 (upper)
+      description: Action to run on button 1 (upper) single press
+      default: []
+      selector:
+        action: null
+    button_two_short_press:
+      name: Single Press - Button 2 (middle)
+      description: Action to run on button 2 (middle) single press
+      default: []
+      selector:
+        action: null
+    button_two_hold:
+      name: Hold - Button 2 (middle)
+      description: Action to run on button 2 (middle) single press
+      default: []
+      selector:
+        action: null
+    button_two_double_press:
+      name: Double Press - Button 2 (middle)
+      description: Action to run on button 2 (middle) single press
+      default: []
+      selector:
+        action: null
+    button_three_short_press:
+      name: Single Press - Button 3 (lower)
+      description: Action to run on button 3 single press
+      default: []
+      selector:
+        action: null
+    button_three_hold:
+      name: Hold - Button 3 (lower)
+      description: Action to run on button 3 long press
+      default: []
+      selector:
+        action: null
+    button_three_double_press:
+      name: Double Press - Button 3 (lower)
+      description: Action to run on button 3 long press
+      default: []
+      selector:
+        action: null
+  source_url: https://forge.slopez.fr/homeassistant/blueprints/raw/branch/main/Z2M/tuya/3_gang_portable_remote.yaml
+mode: single
+max_exceeded: silent
+variables:
+  command: '{{ trigger.payload }}'
+  topic: '{{ trigger.topic }}'
+  switch_name: !input 'switch'
+  deviceName: '{{ state_attr(switch_name, ''friendly_name'') }}'
+trigger:
+- platform: mqtt
+  topic: zigbee2mqtt/+/action
+action:
+- choose:
+  - conditions:
+    - '{{ topic.split(''/'')[1].replace(''/'', '''') == deviceName.split('' '')[0]
+      }}'
+    sequence:
+    - choose:
+      - conditions:
+        - '{{ command == ''1_single'' }}'
+        sequence: !input 'button_one_short_press'
+      - conditions:
+        - '{{ command == ''2_single'' }}'
+        sequence: !input 'button_two_short_press'
+      - conditions:
+        - '{{ command == ''3_single'' }}'
+        sequence: !input 'button_three_short_press'
+      - conditions:
+        - '{{ command == ''1_double'' }}'
+        sequence: !input 'button_one_double_press'
+      - conditions:
+        - '{{ command == ''2_double'' }}'
+        sequence: !input 'button_two_double_press'
+      - conditions:
+        - '{{ command == ''3_double'' }}'
+        sequence: !input 'button_three_double_press'
+      - conditions:
+        - '{{ command == ''1_hold'' }}'
+        sequence: !input 'button_one_hold'
+      - conditions:
+        - '{{ command == ''2_hold'' }}'
+        sequence: !input 'button_two_hold'
+      - conditions:
+        - '{{ command == ''3_hold'' }}'
+        sequence: !input 'button_three_hold'
